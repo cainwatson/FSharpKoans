@@ -60,6 +60,23 @@ module ``about the stock example`` =
 
     [<Koan>]
     let YouGotTheAnswerCorrect() =
-        let result =  __
-        
-        AssertEquality "2012-03-13" result
+        let _, biggestDifferenceDate =
+          stockData
+          |> List.skip 1
+          |> List.fold (fun (biggestDifference, biggestDifferenceDate) csv ->
+            let values = csv.Split([|','|])
+            match values with
+            | [| date; openPrice; _; _; closePrice; _; _ |] ->
+              let openPrice = System.Double.Parse(openPrice)
+              let closePrice = System.Double.Parse(closePrice)
+              let difference = abs closePrice - openPrice
+
+              if difference > biggestDifference then
+                (difference, date)
+              else
+                (biggestDifference, biggestDifferenceDate)
+            | _ ->
+              (biggestDifference, biggestDifferenceDate)
+          ) (0.0, "")
+
+        AssertEquality "2012-03-13" biggestDifferenceDate
